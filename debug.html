@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug Console</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    .instructions {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    ol {
+      margin-left: 20px;
+    }
+    .note {
+      color: #666;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <h1>Debug Console Instructions</h1>
+  
+  <div class="instructions">
+    <p>To debug the blank login page issue, follow these steps:</p>
+    <ol>
+      <li>Open your application in a browser (http://localhost:3000)</li>
+      <li>Right-click on the blank page and select "Inspect" or press F12</li>
+      <li>Go to the "Console" tab in the developer tools</li>
+      <li>Look for any red error messages that might explain why the page is blank</li>
+      <li>Check the "Network" tab to see if any resources failed to load</li>
+    </ol>
+    <p class="note">Note: Common issues include missing dependencies, JavaScript errors, or CSS problems.</p>
+  </div>
+
+  <h2>Possible Solutions:</h2>
+  <ul>
+    <li><strong>Missing Bootstrap:</strong> Make sure bootstrap is installed and imported correctly</li>
+    <li><strong>React Router Issues:</strong> Check if there are any routing errors</li>
+    <li><strong>JavaScript Errors:</strong> Look for syntax errors or missing dependencies</li>
+    <li><strong>API Connection:</strong> The backend might not be running or accessible</li>
+  </ul>
+
+  <h2>Quick Fixes to Try:</h2>
+  <ol>
+    <li>Install missing dependencies: <code>npm install</code></li>
+    <li>Clear browser cache and reload</li>
+    <li>Check if the backend server is running</li>
+    <li>Try running just the frontend: <code>npm start</code></li>
+  </ol>
+</body>
+</html>

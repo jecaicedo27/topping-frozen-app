@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Mock Data to LocalStorage</title>
+</head>
+<body>
+    <h1>Add Mock Data to LocalStorage</h1>
+    <p>This page will add mock order data to your browser's localStorage.</p>
+    <button id="addData">Add Mock Data</button>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('addData').addEventListener('click', function() {
+            // Mock data for demonstration
+            const mockOrders = [
+                {
+                    id: '1',
+                    invoiceCode: 'FAC-001',
+                    clientName: 'Juan Pérez',
+                    date: '2025-05-15',
+                    time: '10:30:00',
+                    deliveryMethod: 'Domicilio',
+                    paymentMethod: 'Efectivo',
+                    totalAmount: 75000,
+                    status: 'pending_wallet',
+                    paymentStatus: 'Pendiente por cobrar',
+                    billedBy: 'Depto. Facturación',
+                    address: 'Calle 123 #45-67, Apto 301',
+                    phone: '3101234567',
+                    notes: 'Entregar en la dirección principal',
+                    history: []
+                },
+                {
+                    id: '2',
+                    invoiceCode: 'FAC-002',
+                    clientName: 'María López',
+                    date: '2025-05-15',
+                    time: '11:15:00',
+                    deliveryMethod: 'Recogida en tienda',
+                    paymentMethod: 'Transferencia bancaria',
+                    totalAmount: 120000,
+                    status: 'pending_wallet',
+                    paymentStatus: 'Pendiente por cobrar',
+                    billedBy: 'Depto. Facturación',
+                    notes: 'Cliente frecuente',
+                    history: []
+                }
+            ];
+
+            // Save to localStorage
+            localStorage.setItem('orders', JSON.stringify(mockOrders));
+            document.getElementById('result').innerHTML = 'Mock data added to localStorage. You can now close this page and refresh the app.';
+        });
+    </script>
+</body>
+</html>

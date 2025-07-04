@@ -1,0 +1,3 @@
+@echo off
+echo Starting frontend with local authentication (no backend required)...
+npx webpack serve --config webpack.config.local.js --mode development
