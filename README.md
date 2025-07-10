@@ -88,23 +88,36 @@ cd backend
 npm install
 cd ..
 
+# 4. CONFIGURACIÓN AUTOMÁTICA MYSQL LOCAL (RECOMENDADO)
+# Windows:
+setup-local-mysql.bat
+
+# Linux/Mac:
+node setup-local-mysql.js
+
+# 5. Inicializar base de datos
+npm run backend:init-db
+
+# 6. Crear usuario admin
+node create-admin-user.js
+
+# 7. Ejecutar aplicación
+npm run dev
+```
+
+### **Configuración Manual (Opcional)**
+
+Si prefieres configurar manualmente:
+
+```bash
 # 4. Configurar base de datos MySQL
-# Crear base de datos 'gestion_pedidos_db'
+# Crear base de datos 'gestionPedidos'
 # Ejecutar: backend/src/config/database.sql
 
 # 5. Configurar variables de entorno
 cp .env.example .env
 cp backend/.env.example backend/.env
-# Editar archivos .env con tus credenciales
-
-# 6. Inicializar base de datos
-npm run backend:init-db
-
-# 7. Crear usuario admin
-node create-admin-user.js
-
-# 8. Ejecutar aplicación
-npm run dev
+# Editar archivos .env con tus credenciales MySQL
 ```
 
 ### **Credenciales por Defecto**
