@@ -18,15 +18,17 @@ import Login from './pages/Login';
 // Context
 import { AuthProvider } from './context/AuthContext';
 import { OrderProvider } from './context/OrderContext';
+import { CompanyProvider } from './context/CompanyContext';
 
 // Types
 import { UserRole } from './types/user';
 
 const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <OrderProvider>
-        <Routes>
+    <CompanyProvider>
+      <AuthProvider>
+        <OrderProvider>
+          <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/404" element={<NotFound />} />
@@ -88,9 +90,10 @@ const App: React.FC = () => {
 
         {/* Catch All Route */}
         <Route path="*" element={<Navigate to="/404" replace />} />
-        </Routes>
-      </OrderProvider>
-    </AuthProvider>
+          </Routes>
+        </OrderProvider>
+      </AuthProvider>
+    </CompanyProvider>
   );
 };
 
