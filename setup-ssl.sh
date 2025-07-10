@@ -89,7 +89,7 @@ $SUDO systemctl status certbot.timer
 
 # Actualizar variables de entorno con HTTPS
 print_status "⚙️ Actualizando variables de entorno..."
-cd /home/topping-frozen-app
+cd /home/gestionPedidos
 
 # Actualizar .env principal
 sed -i "s|FRONTEND_URL=.*|FRONTEND_URL=https://$DOMAIN|" .env

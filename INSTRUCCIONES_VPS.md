@@ -11,7 +11,7 @@ ssh root@TU_IP_DEL_VPS
 ### 2️⃣ **Descargar y Ejecutar Script Automático**
 ```bash
 # Descargar el script de despliegue
-wget https://raw.githubusercontent.com/jecaicedo27/topping-frozen-app/main/deploy-to-vps.sh
+wget https://raw.githubusercontent.com/jecaicedo27/gestionPedidos/main/deploy-to-vps.sh
 
 # Hacer ejecutable
 chmod +x deploy-to-vps.sh
@@ -67,7 +67,7 @@ sudo systemctl restart mysql
 ### **Actualizar la Aplicación**
 ```bash
 # Ir al directorio de la aplicación
-cd /home/topping-frozen-app
+cd /home/gestionPedidos
 
 # Ejecutar script de actualización
 ./update-app.sh
@@ -126,8 +126,8 @@ mysql -u appuser -p gestionPedidos
 ### **Problemas de Permisos**
 ```bash
 # Ajustar permisos de archivos
-sudo chown -R www-data:www-data /home/topping-frozen-app
-sudo chmod -R 755 /home/topping-frozen-app
+sudo chown -R www-data:www-data /home/gestionPedidos
+sudo chmod -R 755 /home/gestionPedidos
 ```
 
 ---
@@ -135,10 +135,10 @@ sudo chmod -R 755 /home/topping-frozen-app
 ## 📊 Información del Sistema
 
 ### **Archivos Importantes**
-- **Aplicación:** `/home/topping-frozen-app/`
+- **Aplicación:** `/home/gestionPedidos/`
 - **Configuración Nginx:** `/etc/nginx/sites-available/gestion-pedidos`
 - **Logs Nginx:** `/var/log/nginx/`
-- **Variables de entorno:** `/home/topping-frozen-app/.env`
+- **Variables de entorno:** `/home/gestionPedidos/.env`
 
 ### **Puertos Utilizados**
 - **80:** HTTP (Nginx)

@@ -134,13 +134,13 @@ print_success "Usuario '$DB_USER' creado con permisos"
 # Paso 10: Clonar repositorio
 print_status "📦 Clonando repositorio de la aplicación..."
 cd /home
-if [ -d "topping-frozen-app" ]; then
+if [ -d "gestionPedidos" ]; then
     print_warning "El directorio ya existe, actualizando..."
-    cd topping-frozen-app
+    cd gestionPedidos
     git pull origin main
 else
-    git clone https://github.com/jecaicedo27/topping-frozen-app.git
-    cd topping-frozen-app
+    git clone https://github.com/jecaicedo27/gestionPedidos.git
+    cd gestionPedidos
 fi
 
 # Paso 11: Instalar dependencias
@@ -225,7 +225,7 @@ server {
 
     # Frontend (archivos estáticos)
     location / {
-        root /home/topping-frozen-app/dist;
+        root /home/gestionPedidos/dist;
         try_files \$uri \$uri/ /index.html;
     }
 
@@ -244,7 +244,7 @@ server {
 
     # Archivos subidos
     location /uploads {
-        alias /home/topping-frozen-app/backend/uploads;
+        alias /home/gestionPedidos/backend/uploads;
     }
 }
 EOF
@@ -284,8 +284,8 @@ print_success "PM2 configurado y aplicación iniciada"
 
 # Paso 18: Configurar permisos
 print_status "🔐 Configurando permisos..."
-$SUDO chown -R www-data:www-data /home/topping-frozen-app
-$SUDO chmod -R 755 /home/topping-frozen-app
+$SUDO chown -R www-data:www-data /home/gestionPedidos
+$SUDO chmod -R 755 /home/gestionPedidos
 
 # Crear script de actualización
 print_status "📝 Creando script de actualización..."
@@ -293,7 +293,7 @@ cat > update-app.sh << 'EOF'
 #!/bin/bash
 echo "🔄 Actualizando aplicación..."
 
-cd /home/topping-frozen-app
+cd /home/gestionPedidos
 
 # Backup de configuración
 cp .env .env.backup

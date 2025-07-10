@@ -112,8 +112,8 @@ EXIT;
 cd /home
 
 # Clonar el repositorio
-git clone https://github.com/jecaicedo27/topping-frozen-app.git
-cd topping-frozen-app
+git clone https://github.com/jecaicedo27/gestionPedidos.git
+cd gestionPedidos
 ```
 
 ### 4.2 Instalar Dependencias
@@ -246,7 +246,7 @@ server {
 
     # Frontend (archivos estáticos)
     location / {
-        root /home/topping-frozen-app/dist;
+        root /home/gestionPedidos/dist;
         try_files $uri $uri/ /index.html;
     }
 
@@ -265,7 +265,7 @@ server {
 
     # Archivos subidos
     location /uploads {
-        alias /home/topping-frozen-app/backend/uploads;
+        alias /home/gestionPedidos/backend/uploads;
     }
 }
 ```
@@ -415,7 +415,7 @@ nano update-app.sh
 echo "🔄 Actualizando aplicación..."
 
 # Ir al directorio de la aplicación
-cd /home/topping-frozen-app
+cd /home/gestionPedidos
 
 # Hacer backup de archivos de configuración
 cp .env .env.backup
@@ -457,8 +457,8 @@ sudo tail -f /var/log/mysql/error.log
 ### Error de Permisos de Archivos
 ```bash
 # Ajustar permisos
-sudo chown -R www-data:www-data /home/topping-frozen-app
-sudo chmod -R 755 /home/topping-frozen-app
+sudo chown -R www-data:www-data /home/gestionPedidos
+sudo chmod -R 755 /home/gestionPedidos
 ```
 
 ### Error de Nginx
