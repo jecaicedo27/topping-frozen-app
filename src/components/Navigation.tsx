@@ -2,10 +2,12 @@ import React from 'react';
 import { Navbar, Container, Nav, NavDropdown, Button } from 'react-bootstrap';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useCompany } from '../context/CompanyContext';
 import { UserRole } from '../types/user';
 
 const Navigation: React.FC = () => {
   const { authState, logout } = useAuth();
+  const { config } = useCompany();
   const { user } = authState;
   const location = useLocation();
   const navigate = useNavigate();
@@ -18,9 +20,32 @@ const Navigation: React.FC = () => {
   };
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg" className="mb-3" expanded={true}>
+    <Navbar 
+      bg="dark" 
+      variant="dark" 
+      expand="lg" 
+      className="mb-3" 
+      expanded={true}
+      style={{ 
+        backgroundColor: config.features.customBranding ? config.company.primaryColor : undefined 
+      }}
+    >
       <Container>
-        <Navbar.Brand as={Link} to="/">TOPPING FROZEN</Navbar.Brand>
+        <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
+          {config.company.logo && (
+            <img 
+              src={config.company.logo} 
+              alt={`${config.company.name} Logo`}
+              height="30" 
+              className="me-2"
+              onError={(e) => {
+                // Si la imagen no carga, ocultarla
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          )}
+          {config.company.name}
+        </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">

@@ -1,7 +1,7 @@
 {
-  "name": "topping-frozen-backend",
+  "name": "gestion-pedidos-backend",
   "version": "1.0.0",
-  "description": "Backend API for Topping Frozen Order Management System",
+  "description": "Backend API for Gestión de Pedidos - Order Management System",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",

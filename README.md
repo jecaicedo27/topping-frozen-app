@@ -1,6 +1,27 @@
-# 🍦 Topping Frozen - Sistema de Gestión de Pedidos
+# 📦 Gestión de Pedidos - Sistema Multi-Empresa
 
-Sistema completo de gestión de pedidos con historial de recepciones de dinero y captura de fotos para evidencia.
+Sistema completo de gestión de pedidos configurable para múltiples empresas, con historial de recepciones de dinero y captura de fotos para evidencia.
+
+## 🏢 **NUEVO: Sistema Multi-Empresa**
+
+Esta aplicación ahora soporta configuración personalizada para diferentes empresas:
+
+- **🎨 Branding Personalizado**: Logo, colores y nombre de empresa
+- **🌐 Dominio Específico**: Cada empresa puede usar su propio dominio
+- **💾 Base de Datos Separada**: Configuración independiente por empresa
+- **⚙️ Instalación Guiada**: Script interactivo para configuración inicial
+
+### 🚀 **Instalación Rápida para Empresas**
+
+```bash
+# Windows
+install-company.bat
+
+# Linux/Mac/Multiplataforma
+node install-company.js
+```
+
+Ver [EMPRESA_SETUP_GUIDE.md](EMPRESA_SETUP_GUIDE.md) para guía completa.
 
 ## 🚀 Características Principales
 
@@ -56,8 +77,8 @@ Sistema completo de gestión de pedidos con historial de recepciones de dinero y
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/TU_USUARIO/topping-frozen-app.git
-cd topping-frozen-app
+git clone https://github.com/TU_USUARIO/gestion-pedidos.git
+cd gestion-pedidos
 
 # 2. Instalar dependencias del frontend
 npm install
@@ -67,23 +88,36 @@ cd backend
 npm install
 cd ..
 
+# 4. CONFIGURACIÓN AUTOMÁTICA MYSQL LOCAL (RECOMENDADO)
+# Windows:
+setup-local-mysql.bat
+
+# Linux/Mac:
+node setup-local-mysql.js
+
+# 5. Inicializar base de datos
+npm run backend:init-db
+
+# 6. Crear usuario admin
+node create-admin-user.js
+
+# 7. Ejecutar aplicación
+npm run dev
+```
+
+### **Configuración Manual (Opcional)**
+
+Si prefieres configurar manualmente:
+
+```bash
 # 4. Configurar base de datos MySQL
-# Crear base de datos 'topping_frozen_db'
+# Crear base de datos 'gestionPedidos'
 # Ejecutar: backend/src/config/database.sql
 
 # 5. Configurar variables de entorno
 cp .env.example .env
 cp backend/.env.example backend/.env
-# Editar archivos .env con tus credenciales
-
-# 6. Inicializar base de datos
-npm run backend:init-db
-
-# 7. Crear usuario admin
-node create-admin-user.js
-
-# 8. Ejecutar aplicación
-npm run dev
+# Editar archivos .env con tus credenciales MySQL
 ```
 
 ### **Credenciales por Defecto**
@@ -101,13 +135,13 @@ npm run dev
 
 # Crear repositorio en GitHub.com
 # Conectar repositorio local
-git remote add origin https://github.com/TU_USUARIO/topping-frozen-app.git
+git remote add origin https://github.com/TU_USUARIO/gestion-pedidos.git
 git push -u origin main
 ```
 
 #### **2. Configurar PlanetScale**
 1. Crear cuenta en [PlanetScale](https://planetscale.com)
-2. Crear base de datos `topping-frozen-db`
+2. Crear base de datos `gestion_pedidos_db`
 3. Obtener credenciales de conexión
 4. Ejecutar migraciones desde el dashboard
 
@@ -119,7 +153,7 @@ git push -u origin main
    DB_HOST=tu-host-planetscale
    DB_USER=tu-usuario-planetscale
    DB_PASSWORD=tu-password-planetscale
-   DB_NAME=topping-frozen-db
+   DB_NAME=gestion_pedidos_db
    DB_PORT=3306
    JWT_SECRET=tu-jwt-secret-super-seguro
    NODE_ENV=production
@@ -171,7 +205,7 @@ node add-mock-data.js        # Agregar datos de prueba
 ## 🏗️ Estructura del Proyecto
 
 ```
-topping-frozen-app/
+gestion-pedidos/
 ├── src/                    # Frontend React
 │   ├── components/         # Componentes reutilizables
 │   ├── pages/             # Páginas principales
@@ -188,7 +222,12 @@ topping-frozen-app/
 │   │   ├── config/        # Configuración y migraciones
 │   │   └── scripts/       # Scripts utilitarios
 │   └── uploads/           # Archivos subidos
+├── config/                # Configuración de empresa
 ├── public/                # Archivos estáticos
+├── install-company.js     # Instalador interactivo
+├── install-company.bat    # Instalador Windows
+├── start-company.bat      # Iniciador Windows
+├── EMPRESA_SETUP_GUIDE.md # Guía configuración empresas
 ├── DEPLOYMENT_GUIDE.md    # Guía detallada de despliegue
 ├── vercel.json           # Configuración Vercel
 ├── package.json          # Dependencias principales
@@ -216,6 +255,12 @@ topping-frozen-app/
 - `GET /api/money-receipts` - Historial de recepciones
 - `POST /api/money-receipts` - Registrar recepción
 - `GET /api/money-receipts/:id/photo` - Obtener foto
+
+### **Configuración de Empresa (NUEVO)**
+- `GET /api/company/info` - Información pública de la empresa
+- `GET /api/company/config` - Configuración completa (requiere auth)
+- `PUT /api/company/config` - Actualizar configuración (admin)
+- `GET /api/company/health` - Estado de salud de la configuración
 
 ## 🎯 Flujo de Trabajo
 
@@ -268,9 +313,9 @@ Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más detalles.
 ## 📞 Soporte
 
 Para soporte técnico o preguntas:
-- **Email:** soporte@toppingfrozen.com
-- **GitHub Issues:** [Crear issue](https://github.com/TU_USUARIO/topping-frozen-app/issues)
+- **Email:** soporte@gestionpedidos.com
+- **GitHub Issues:** [Crear issue](https://github.com/TU_USUARIO/gestion-pedidos/issues)
 
 ---
 
-**¡Tu sistema de gestión de pedidos Topping Frozen está listo para la nube! 🚀**
+**¡Tu sistema de gestión de pedidos está listo para la nube! 🚀**
