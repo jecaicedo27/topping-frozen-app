@@ -1,3 +1,0 @@
-@echo off
-echo Starting frontend on port 3001...
-npx webpack serve --config webpack.config.alt.js --mode development

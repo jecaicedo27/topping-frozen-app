@@ -1,3 +1,0 @@
-@echo off
-echo Opening simple React app in default browser...
-start simple-react-app.html
