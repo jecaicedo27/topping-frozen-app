@@ -223,16 +223,23 @@ else
     print_error "Error en configuración de Nginx"
 fi
 
-# 15. Configurar PM2
+# 15. Compilar backend para producción
+print_status "Compilando backend para producción..."
+cd backend
+npm run build 2>/dev/null || {
+    print_warning "No se encontró script build, compilando manualmente..."
+    npx tsc
+}
+cd ..
+
+# 16. Configurar PM2
 print_status "Configurando PM2..."
 cat > ecosystem.config.js << EOF
 module.exports = {
   apps: [
     {
       name: 'topping-frozen-backend',
-      script: 'backend/src/index.ts',
-      interpreter: 'node',
-      interpreter_args: '--loader ts-node/esm',
+      script: 'backend/dist/index.js',
       env: {
         NODE_ENV: 'production',
         PORT: 3001
@@ -252,10 +259,7 @@ EOF
 # Crear directorio de logs
 mkdir -p /var/log/pm2
 
-# Instalar ts-node globalmente para PM2
-npm install -g ts-node typescript
-
-# 16. Iniciar aplicación con PM2
+# 17. Iniciar aplicación con PM2
 print_status "Iniciando aplicación con PM2..."
 pm2 start ecosystem.config.js
 pm2 save
