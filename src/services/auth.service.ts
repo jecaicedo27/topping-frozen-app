@@ -1,5 +1,4 @@
 import api from './api';
-import { tokenManager } from './tokenManager';
 
 export interface LoginCredentials {
   username: string;
@@ -24,23 +23,16 @@ export const AuthService = {
   // Login user
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
     try {
-      console.log('AuthService: Attempting login with credentials:', credentials);
-      console.log('AuthService: API base URL:', api.defaults.baseURL);
-      
       const response = await api.post<AuthResponse>('/auth/login', credentials);
       
-      console.log('AuthService: Login response:', response.data);
-      
-      // Store token in memory if login successful
+      // Store token and user in localStorage
       if (response.data.success && response.data.data) {
-        tokenManager.setToken(response.data.data.token);
-        console.log('AuthService: Token stored in memory');
+        localStorage.setItem('token', response.data.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.data.user));
       }
       
       return response.data;
     } catch (error: any) {
-      console.error('AuthService: Login error:', error);
-      console.error('AuthService: Error response:', error.response?.data);
       return {
         success: false,
         message: error.response?.data?.message || 'Login failed'
@@ -50,34 +42,28 @@ export const AuthService = {
   
   // Logout user
   logout: (): void => {
-    // Clear token from memory
-    tokenManager.clearToken();
-    console.log('AuthService: Token cleared from memory');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    // Use React Router for navigation instead of forcing a page reload
+    // The AuthContext will handle the redirect
   },
   
-  // Get current user from server
-  getCurrentUser: async (): Promise<any> => {
-    try {
-      const response = await api.get('/auth/me');
-      return response.data.success ? response.data.data : null;
-    } catch (error) {
-      console.error('AuthService: Error getting current user:', error);
-      return null;
+  // Get current user
+  getCurrentUser: (): any => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      return JSON.parse(userStr);
     }
+    return null;
   },
   
-  // Verify token with server
-  verifyToken: async (): Promise<boolean> => {
-    try {
-      // Check if we have a token in memory first
-      if (!tokenManager.hasToken()) {
-        return false;
-      }
-      
-      const response = await api.get('/auth/verify');
-      return response.data.success;
-    } catch (error) {
-      return false;
-    }
+  // Check if user is authenticated
+  isAuthenticated: (): boolean => {
+    return !!localStorage.getItem('token');
+  },
+  
+  // Get auth token
+  getToken: (): string | null => {
+    return localStorage.getItem('token');
   }
 };

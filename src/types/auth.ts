@@ -23,7 +23,6 @@ export interface AuthContextType {
   authState: AuthState;
   login: (credentials: LoginCredentials) => Promise<boolean>;
   logout: () => void;
-  clearError: () => void;
 }
 
 // Mock users for demonstration

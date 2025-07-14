@@ -62,8 +62,7 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
 export const AuthContext = createContext<AuthContextType>({
   authState: initialState,
   login: async () => false,
-  logout: () => {},
-  clearError: () => {}
+  logout: () => {}
 });
 
 // Auth provider component
@@ -125,13 +124,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'LOGOUT' });
   };
 
-  // Clear error function
-  const clearError = () => {
-    dispatch({ type: 'CLEAR_ERROR' });
-  };
-
   return (
-    <AuthContext.Provider value={{ authState, login, logout, clearError }}>
+    <AuthContext.Provider value={{ authState, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -63,63 +63,51 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
 export const AuthContext = createContext<AuthContextType>({
   authState: initialState,
   login: async () => false,
-  logout: () => {},
-  clearError: () => {}
+  logout: () => {}
 });
 
 // Auth provider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [authState, dispatch] = useReducer(authReducer, initialState);
 
-  // Check authentication on app start
+  // Check if user is already logged in (from localStorage)
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAuth = () => {
       try {
-        // Verify token with server
-        const isValid = await AuthService.verifyToken();
+        // Check if user is authenticated using AuthService
+        const user = AuthService.getCurrentUser();
+        const isAuthenticated = AuthService.isAuthenticated();
         
-        if (isValid) {
-          // Get current user from server
-          const user = await AuthService.getCurrentUser();
-          if (user) {
-            dispatch({ type: 'LOGIN_SUCCESS', payload: user });
-          } else {
-            dispatch({ type: 'SET_LOADING', payload: false });
-          }
+        if (isAuthenticated && user) {
+          dispatch({ type: 'LOGIN_SUCCESS', payload: user });
         } else {
           dispatch({ type: 'SET_LOADING', payload: false });
         }
       } catch (error) {
-        console.error('Auth check failed:', error);
         dispatch({ type: 'SET_LOADING', payload: false });
       }
     };
 
     checkAuth();
+    // We only want this to run once on component mount
   }, []);
 
   // Login function
   const login = async (credentials: LoginCredentials): Promise<boolean> => {
     try {
-      console.log('AuthContext: Starting login process');
       dispatch({ type: 'SET_LOADING', payload: true });
       
       // Use AuthService to login
       const response = await AuthService.login(credentials);
       
-      console.log('AuthContext: AuthService response:', response);
-      
       if (response.success && response.data) {
-        console.log('AuthContext: Login successful, dispatching LOGIN_SUCCESS');
         dispatch({ type: 'LOGIN_SUCCESS', payload: response.data.user });
         return true;
       } else {
-        console.log('AuthContext: Login failed, dispatching LOGIN_FAILURE');
         dispatch({ type: 'LOGIN_FAILURE', payload: response.message || 'Credenciales inválidas' });
         return false;
       }
     } catch (error) {
-      console.error('AuthContext: Login error:', error);
       dispatch({ type: 'LOGIN_FAILURE', payload: 'Error de autenticación' });
       return false;
     }
@@ -131,13 +119,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'LOGOUT' });
   };
 
-  // Clear error function
-  const clearError = () => {
-    dispatch({ type: 'CLEAR_ERROR' });
-  };
-
   return (
-    <AuthContext.Provider value={{ authState, login, logout, clearError }}>
+    <AuthContext.Provider value={{ authState, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

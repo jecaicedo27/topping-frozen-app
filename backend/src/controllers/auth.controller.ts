@@ -24,7 +24,7 @@ export class AuthController {
         return;
       }
       
-      // Verify credentials with database only
+      // Verify credentials
       const user = await UserModel.verifyPassword(username, password);
       
       if (!user) {
@@ -42,14 +42,12 @@ export class AuthController {
         { expiresIn: '24h' }
       );
       
-      // Return user and token (exclude password)
-      const { password: _, ...userWithoutPassword } = user;
-      
+      // Return user and token
       res.status(200).json({
         success: true,
         message: 'Login successful',
         data: {
-          user: userWithoutPassword,
+          user,
           token
         }
       });
@@ -92,23 +90,6 @@ export class AuthController {
       });
     } catch (error) {
       console.error('Error getting current user:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Internal server error'
-      });
-    }
-  }
-
-  // Verify token
-  static async verifyToken(req: Request, res: Response): Promise<void> {
-    try {
-      // If we reach here, the token is valid (middleware already verified it)
-      res.status(200).json({
-        success: true,
-        message: 'Token is valid'
-      });
-    } catch (error) {
-      console.error('Error verifying token:', error);
       res.status(500).json({
         success: false,
         message: 'Internal server error'

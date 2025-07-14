@@ -1,8 +1,7 @@
 import axios from 'axios';
-import { tokenManager } from './tokenManager';
 
-// API base URL - Use server IP for production
-const API_URL = process.env.REACT_APP_API_URL || 'http://46.202.93.54/api';
+// API base URL
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 // Create axios instance
 const api = axios.create({
@@ -15,7 +14,7 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const token = tokenManager.getToken();
+    const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -30,8 +29,9 @@ api.interceptors.response.use(
   (error) => {
     // Handle 401 Unauthorized errors
     if (error.response && error.response.status === 401) {
-      // Clear token from memory
-      tokenManager.clearToken();
+      // Clear token
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
       
       // Only redirect to login if we're not already on the login page
       // This prevents redirect loops

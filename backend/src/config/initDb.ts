@@ -9,9 +9,8 @@ dotenv.config();
 // Database connection configuration
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'toppinguser',
-  password: process.env.DB_PASSWORD || 'ToppingPass2024!',
-  database: process.env.DB_NAME || 'topping_frozen_db',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
   port: parseInt(process.env.DB_PORT || '3306'),
   multipleStatements: true
 };
@@ -25,8 +24,8 @@ const initializeDatabase = async (): Promise<void> => {
     connection = await mysql.createConnection(dbConfig);
     console.log('Connected to MySQL server');
     
-    // Read SQL file (use safe version that doesn't drop tables)
-    const sqlFilePath = path.join(__dirname, 'database-safe.sql');
+    // Read SQL file
+    const sqlFilePath = path.join(__dirname, 'database-fixed.sql');
     const sqlScript = fs.readFileSync(sqlFilePath, 'utf8');
     
     // Execute SQL script
