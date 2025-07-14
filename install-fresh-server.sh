@@ -83,13 +83,18 @@ mysql -e "FLUSH PRIVILEGES;"
 
 print_status "Base de datos MySQL configurada"
 
-# 6. Instalar Nginx
-print_status "Instalando Nginx..."
-apt install -y nginx
+# 6. Instalar Nginx y PHP
+print_status "Instalando Nginx y PHP..."
+apt install -y nginx apache2 php php-mysql php-mbstring php-zip php-gd php-json php-curl php-fpm
 
-# Habilitar Nginx
+# Habilitar servicios
 systemctl start nginx
 systemctl enable nginx
+systemctl start apache2
+systemctl enable apache2
+
+# Habilitar módulos de PHP
+phpenmod mbstring
 
 # 7. Configurar firewall básico
 print_status "Configurando firewall..."
@@ -223,7 +228,98 @@ else
     print_error "Error en configuración de Nginx"
 fi
 
-# 15. Compilar backend para producción
+# 15. Instalar y configurar phpMyAdmin
+print_status "Instalando phpMyAdmin..."
+
+# Configurar firewall para phpMyAdmin
+ufw allow 8080/tcp
+
+# Descargar phpMyAdmin
+cd /tmp
+wget https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-all-languages.tar.gz
+tar xzf phpMyAdmin-latest-all-languages.tar.gz
+
+# Instalar phpMyAdmin
+PHPMYADMIN_DIR=$(ls -d phpMyAdmin-*/ | head -1)
+mv "$PHPMYADMIN_DIR" /var/www/html/phpmyadmin
+chown -R www-data:www-data /var/www/html/phpmyadmin
+
+# Configurar phpMyAdmin
+cd /var/www/html/phpmyadmin
+cp config.sample.inc.php config.inc.php
+
+# Generar blowfish secret
+BLOWFISH_SECRET=$(openssl rand -base64 32)
+
+# Crear configuración
+cat > config.inc.php << EOF
+<?php
+\$cfg['blowfish_secret'] = '$BLOWFISH_SECRET';
+
+\$i = 0;
+\$i++;
+\$cfg['Servers'][\$i]['auth_type'] = 'cookie';
+\$cfg['Servers'][\$i]['host'] = 'localhost';
+\$cfg['Servers'][\$i]['compress'] = false;
+\$cfg['Servers'][\$i]['AllowNoPassword'] = false;
+
+\$cfg['UploadDir'] = '';
+\$cfg['SaveDir'] = '';
+\$cfg['CheckConfigurationPermissions'] = false;
+\$cfg['TempDir'] = '/var/lib/phpmyadmin/tmp';
+EOF
+
+# Crear directorios necesarios
+mkdir -p /var/lib/phpmyadmin/tmp
+chown -R www-data:www-data /var/lib/phpmyadmin
+
+# Configurar Nginx para phpMyAdmin
+cat > /etc/nginx/sites-available/phpmyadmin << EOF
+server {
+    listen 8080;
+    server_name $SERVER_IP;
+    root /var/www/html/phpmyadmin;
+    index index.php index.html index.htm;
+
+    location / {
+        try_files \$uri \$uri/ =404;
+    }
+
+    location ~ \.php\$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+
+    access_log /var/log/nginx/phpmyadmin.access.log;
+    error_log /var/log/nginx/phpmyadmin.error.log;
+}
+EOF
+
+# Habilitar sitio phpMyAdmin
+ln -sf /etc/nginx/sites-available/phpmyadmin /etc/nginx/sites-enabled/
+
+# Crear usuario de base de datos para phpMyAdmin
+mysql -e "CREATE USER IF NOT EXISTS 'phpmyadmin'@'localhost' IDENTIFIED BY 'PhpMyAdmin2024!';"
+mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'phpmyadmin'@'localhost' WITH GRANT OPTION;"
+mysql -e "FLUSH PRIVILEGES;"
+
+# Reiniciar servicios
+systemctl restart apache2
+systemctl restart php8.1-fpm
+systemctl reload nginx
+
+print_status "phpMyAdmin instalado y configurado"
+
+# Volver al directorio del proyecto
+cd /var/www/topping-frozen-app
+
+# 16. Compilar backend para producción
 print_status "Compilando backend para producción..."
 cd backend
 npm run build 2>/dev/null || {
@@ -314,11 +410,16 @@ echo "   🌐 IP del servidor: $SERVER_IP"
 echo "   🖥️  Frontend: http://$SERVER_IP"
 echo "   🔧 Backend API: http://$SERVER_IP/api"
 echo "   ❤️  Health check: http://$SERVER_IP/api/health"
+echo "   🗄️  phpMyAdmin: http://$SERVER_IP:8080"
 echo ""
 echo "🔐 Credenciales de base de datos:"
-echo "   Usuario: toppinguser"
-echo "   Contraseña: ToppingPass2024!"
-echo "   Base de datos: topping_frozen_db"
+echo "   👤 Usuario aplicación: toppinguser"
+echo "   🔑 Contraseña: ToppingPass2024!"
+echo "   🗄️ Base de datos: topping_frozen_db"
+echo ""
+echo "   👤 Usuario phpMyAdmin: phpmyadmin"
+echo "   🔑 Contraseña: PhpMyAdmin2024!"
+echo "   🗄️ Acceso: Todas las bases de datos"
 echo ""
 echo "👤 Usuarios de prueba (contraseña: 123456):"
 echo "   • admin - Administrador"
