@@ -10,7 +10,7 @@ const Login: React.FC = () => {
     password: ''
   });
   const [validated, setValidated] = useState(false);
-  const { authState, login } = useAuth();
+  const { authState, login, clearError } = useAuth();
   const { loading, error, isAuthenticated } = authState;
   const navigate = useNavigate();
   const location = useLocation();
@@ -29,6 +29,11 @@ const Login: React.FC = () => {
       ...prev,
       [name]: value
     }));
+    
+    // Clear any existing error when user starts typing
+    if (error) {
+      clearError();
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

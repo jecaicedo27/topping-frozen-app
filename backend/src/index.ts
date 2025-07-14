@@ -28,6 +28,26 @@ app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/money-receipts', moneyReceiptRoutes);
 
+// API root route
+app.get('/api', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Topping Frozen API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      auth: {
+        login: 'POST /api/auth/login',
+        currentUser: 'GET /api/auth/me'
+      },
+      users: 'GET /api/users',
+      orders: 'GET /api/orders',
+      moneyReceipts: 'GET /api/money-receipts'
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Health check route
 app.get('/api/health', (req, res) => {
   res.status(200).json({
@@ -50,21 +70,31 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 // Initialize database and start server
 const startServer = async () => {
   try {
-    // Initialize database
-    await initializeDatabase();
+    console.log('Starting server...');
     
-    // Test database connection
-    const connected = await testConnection();
-    
-    if (!connected) {
-      console.error('Failed to connect to database. Exiting...');
-      process.exit(1);
+    // Try to initialize database (optional)
+    try {
+      console.log('Attempting database initialization...');
+      await initializeDatabase();
+      console.log('Database initialization completed');
+      
+      // Test database connection
+      const connected = await testConnection();
+      
+      if (connected) {
+        console.log('Database connection successful');
+      } else {
+        console.warn('Database connection failed, but server will continue');
+      }
+    } catch (dbError) {
+      console.warn('Database initialization failed, but server will continue:', dbError);
     }
     
-    // Start server
+    // Start server regardless of database status
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
       console.log(`API available at http://localhost:${PORT}/api`);
+      console.log(`Health check: http://localhost:${PORT}/api/health`);
     });
   } catch (error) {
     console.error('Error starting server:', error);

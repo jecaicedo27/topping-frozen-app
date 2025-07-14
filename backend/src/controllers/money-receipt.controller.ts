@@ -1,19 +1,24 @@
 import { Request, Response } from 'express';
 import { MoneyReceiptModel, MoneyReceipt } from '../models/money-receipt.model';
-import multer from 'multer';
+import multer, { FileFilterCallback } from 'multer';
 import path from 'path';
 import fs from 'fs';
 
+// Extend Request interface to include file property
+interface RequestWithFile extends Request {
+  file?: Express.Multer.File;
+}
+
 // Configure multer for file uploads
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
+  destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
     const uploadDir = 'uploads/receipts';
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
     cb(null, uploadDir);
   },
-  filename: (req, file, cb) => {
+  filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, 'receipt-' + uniqueSuffix + path.extname(file.originalname));
   }
@@ -24,7 +29,7 @@ const upload = multer({
   limits: {
     fileSize: 5 * 1024 * 1024 // 5MB limit
   },
-  fileFilter: (req, file, cb) => {
+  fileFilter: (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
     const allowedTypes = /jpeg|jpg|png|gif|pdf/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
@@ -42,7 +47,7 @@ export class MoneyReceiptController {
   static uploadMiddleware = upload.single('receipt_photo');
 
   // Create a new money receipt
-  static async createReceipt(req: Request, res: Response): Promise<void> {
+  static async createReceipt(req: RequestWithFile, res: Response): Promise<void> {
     try {
       console.log('Creating money receipt...');
       console.log('Request body:', req.body);

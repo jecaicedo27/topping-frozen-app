@@ -63,7 +63,8 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
 export const AuthContext = createContext<AuthContextType>({
   authState: initialState,
   login: async () => false,
-  logout: () => {}
+  logout: () => {},
+  clearError: () => {}
 });
 
 // Auth provider component
@@ -95,19 +96,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Login function
   const login = async (credentials: LoginCredentials): Promise<boolean> => {
     try {
+      console.log('AuthContext: Starting login process');
       dispatch({ type: 'SET_LOADING', payload: true });
       
       // Use AuthService to login
       const response = await AuthService.login(credentials);
       
+      console.log('AuthContext: AuthService response:', response);
+      
       if (response.success && response.data) {
+        console.log('AuthContext: Login successful, dispatching LOGIN_SUCCESS');
         dispatch({ type: 'LOGIN_SUCCESS', payload: response.data.user });
         return true;
       } else {
+        console.log('AuthContext: Login failed, dispatching LOGIN_FAILURE');
         dispatch({ type: 'LOGIN_FAILURE', payload: response.message || 'Credenciales inválidas' });
         return false;
       }
     } catch (error) {
+      console.error('AuthContext: Login error:', error);
       dispatch({ type: 'LOGIN_FAILURE', payload: 'Error de autenticación' });
       return false;
     }
@@ -119,8 +126,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'LOGOUT' });
   };
 
+  // Clear error function
+  const clearError = () => {
+    dispatch({ type: 'CLEAR_ERROR' });
+  };
+
   return (
-    <AuthContext.Provider value={{ authState, login, logout }}>
+    <AuthContext.Provider value={{ authState, login, logout, clearError }}>
       {children}
     </AuthContext.Provider>
   );

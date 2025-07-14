@@ -23,16 +23,24 @@ export const AuthService = {
   // Login user
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
     try {
+      console.log('AuthService: Attempting login with credentials:', credentials);
+      console.log('AuthService: API base URL:', api.defaults.baseURL);
+      
       const response = await api.post<AuthResponse>('/auth/login', credentials);
+      
+      console.log('AuthService: Login response:', response.data);
       
       // Store token and user in localStorage
       if (response.data.success && response.data.data) {
         localStorage.setItem('token', response.data.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.data.user));
+        console.log('AuthService: Token and user stored in localStorage');
       }
       
       return response.data;
     } catch (error: any) {
+      console.error('AuthService: Login error:', error);
+      console.error('AuthService: Error response:', error.response?.data);
       return {
         success: false,
         message: error.response?.data?.message || 'Login failed'
