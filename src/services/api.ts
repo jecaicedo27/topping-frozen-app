@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { tokenManager } from './tokenManager';
 
-// API base URL - Force correct URL for local development
-const API_URL = 'http://localhost:3001/api';
+// API base URL - Use server IP for production
+const API_URL = process.env.REACT_APP_API_URL || 'http://46.202.93.54/api';
 
 // Create axios instance
 const api = axios.create({
