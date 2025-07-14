@@ -71,26 +71,31 @@ export const AuthContext = createContext<AuthContextType>({
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [authState, dispatch] = useReducer(authReducer, initialState);
 
-  // Check if user is already logged in (from localStorage)
+  // Check authentication on app start
   useEffect(() => {
-    const checkAuth = () => {
+    const checkAuth = async () => {
       try {
-        // Check if user is authenticated using AuthService
-        const user = AuthService.getCurrentUser();
-        const isAuthenticated = AuthService.isAuthenticated();
+        // Verify token with server
+        const isValid = await AuthService.verifyToken();
         
-        if (isAuthenticated && user) {
-          dispatch({ type: 'LOGIN_SUCCESS', payload: user });
+        if (isValid) {
+          // Get current user from server
+          const user = await AuthService.getCurrentUser();
+          if (user) {
+            dispatch({ type: 'LOGIN_SUCCESS', payload: user });
+          } else {
+            dispatch({ type: 'SET_LOADING', payload: false });
+          }
         } else {
           dispatch({ type: 'SET_LOADING', payload: false });
         }
       } catch (error) {
+        console.error('Auth check failed:', error);
         dispatch({ type: 'SET_LOADING', payload: false });
       }
     };
 
     checkAuth();
-    // We only want this to run once on component mount
   }, []);
 
   // Login function

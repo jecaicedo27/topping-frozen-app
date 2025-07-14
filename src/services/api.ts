@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { tokenManager } from './tokenManager';
 
 // API base URL - Force correct URL for local development
 const API_URL = 'http://localhost:3001/api';
@@ -14,7 +15,7 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = tokenManager.getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -29,9 +30,8 @@ api.interceptors.response.use(
   (error) => {
     // Handle 401 Unauthorized errors
     if (error.response && error.response.status === 401) {
-      // Clear token
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      // Clear token from memory
+      tokenManager.clearToken();
       
       // Only redirect to login if we're not already on the login page
       // This prevents redirect loops

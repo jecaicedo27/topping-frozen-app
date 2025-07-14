@@ -1,4 +1,5 @@
 import api from './api';
+import { tokenManager } from './tokenManager';
 
 export interface LoginCredentials {
   username: string;
@@ -30,11 +31,10 @@ export const AuthService = {
       
       console.log('AuthService: Login response:', response.data);
       
-      // Store token and user in localStorage
+      // Store token in memory if login successful
       if (response.data.success && response.data.data) {
-        localStorage.setItem('token', response.data.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.data.user));
-        console.log('AuthService: Token and user stored in localStorage');
+        tokenManager.setToken(response.data.data.token);
+        console.log('AuthService: Token stored in memory');
       }
       
       return response.data;
@@ -50,28 +50,34 @@ export const AuthService = {
   
   // Logout user
   logout: (): void => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    // Use React Router for navigation instead of forcing a page reload
-    // The AuthContext will handle the redirect
+    // Clear token from memory
+    tokenManager.clearToken();
+    console.log('AuthService: Token cleared from memory');
   },
   
-  // Get current user
-  getCurrentUser: (): any => {
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      return JSON.parse(userStr);
+  // Get current user from server
+  getCurrentUser: async (): Promise<any> => {
+    try {
+      const response = await api.get('/auth/me');
+      return response.data.success ? response.data.data : null;
+    } catch (error) {
+      console.error('AuthService: Error getting current user:', error);
+      return null;
     }
-    return null;
   },
   
-  // Check if user is authenticated
-  isAuthenticated: (): boolean => {
-    return !!localStorage.getItem('token');
-  },
-  
-  // Get auth token
-  getToken: (): string | null => {
-    return localStorage.getItem('token');
+  // Verify token with server
+  verifyToken: async (): Promise<boolean> => {
+    try {
+      // Check if we have a token in memory first
+      if (!tokenManager.hasToken()) {
+        return false;
+      }
+      
+      const response = await api.get('/auth/verify');
+      return response.data.success;
+    } catch (error) {
+      return false;
+    }
   }
 };

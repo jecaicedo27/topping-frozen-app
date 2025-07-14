@@ -24,25 +24,8 @@ export class AuthController {
         return;
       }
       
-      // Temporary hardcoded users for testing (when database is not available)
-      const testUsers = [
-        { id: 1, username: 'admin', password: '123456', name: 'Administrador', role: 'admin' },
-        { id: 2, username: 'facturacion', password: '123456', name: 'Usuario Facturación', role: 'facturacion' },
-        { id: 3, username: 'cartera', password: '123456', name: 'Usuario Cartera', role: 'cartera' },
-        { id: 4, username: 'logistica', password: '123456', name: 'Usuario Logística', role: 'logistica' },
-        { id: 5, username: 'mensajero', password: '123456', name: 'Usuario Mensajero', role: 'mensajero' }
-      ];
-      
-      let user = null;
-      
-      try {
-        // Try to verify credentials with database first
-        user = await UserModel.verifyPassword(username, password);
-      } catch (dbError) {
-        console.log('Database not available, using test credentials');
-        // If database fails, use hardcoded credentials
-        user = testUsers.find(u => u.username === username && u.password === password);
-      }
+      // Verify credentials with database only
+      const user = await UserModel.verifyPassword(username, password);
       
       if (!user) {
         res.status(401).json({
@@ -109,6 +92,23 @@ export class AuthController {
       });
     } catch (error) {
       console.error('Error getting current user:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error'
+      });
+    }
+  }
+
+  // Verify token
+  static async verifyToken(req: Request, res: Response): Promise<void> {
+    try {
+      // If we reach here, the token is valid (middleware already verified it)
+      res.status(200).json({
+        success: true,
+        message: 'Token is valid'
+      });
+    } catch (error) {
+      console.error('Error verifying token:', error);
       res.status(500).json({
         success: false,
         message: 'Internal server error'
