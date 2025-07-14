@@ -10,8 +10,33 @@
 - **Logs**: Sistema de depuración implementado
 - **Endpoints**: Documentación de API agregada
 - **Fallback**: Credenciales de prueba cuando DB no disponible
+- **🆕 CORS**: Configuración para usar solo IP (sin DNS)
+- **🆕 Script automático**: Para configuración completa del VPS
 
-## 📋 Pasos para Actualizar el VPS
+## 🚀 Opción 1: Configuración Automática (RECOMENDADO)
+
+### Script Automático para VPS (Solo IP, sin DNS)
+```bash
+# 1. Conectarse al VPS
+ssh root@tu-servidor-vps
+
+# 2. Navegar al directorio del proyecto
+cd /var/www/topping-frozen-app
+
+# 3. Ejecutar script automático
+./configure-vps-ip-only.sh
+```
+
+**El script automático hace todo:**
+- ✅ Actualiza código desde GitHub
+- ✅ Configura variables de entorno con IP del servidor
+- ✅ Elimina configuración DNS
+- ✅ Configura CORS para IP específica
+- ✅ Actualiza Nginx (si existe)
+- ✅ Reinicia servicios
+- ✅ Verifica que todo funcione
+
+## 📋 Opción 2: Configuración Manual
 
 ### 1. Conectarse al VPS
 ```bash
