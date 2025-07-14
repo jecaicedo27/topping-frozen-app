@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check Console for Errors</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      color: #333;
+    }
+    .steps {
+      margin-top: 20px;
+    }
+    .step {
+      margin-bottom: 15px;
+      padding-left: 20px;
+      border-left: 3px solid #007bff;
+    }
+    .error-example {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 10px;
+      border-radius: 5px;
+      font-family: monospace;
+      margin: 10px 0;
+    }
+    .note {
+      background-color: #fff3cd;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+    img {
+      max-width: 100%;
+      border: 1px solid #ddd;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Verificar Errores en la Consola del Navegador</h1>
+    
+    <div class="steps">
+      <p>Si estás viendo una página en blanco en la aplicación, sigue estos pasos para verificar si hay errores en la consola del navegador:</p>
+      
+      <div class="step">
+        <h3>Paso 1: Abrir las Herramientas de Desarrollo</h3>
+        <p>Haz clic derecho en cualquier parte de la página en blanco y selecciona "Inspeccionar" o "Inspeccionar elemento". También puedes presionar F12 o Ctrl+Shift+I (Cmd+Option+I en Mac).</p>
+      </div>
+      
+      <div class="step">
+        <h3>Paso 2: Ir a la pestaña "Console"</h3>
+        <p>En las herramientas de desarrollo, haz clic en la pestaña "Console" o "Consola".</p>
+      </div>
+      
+      <div class="step">
+        <h3>Paso 3: Buscar mensajes de error</h3>
+        <p>Busca mensajes de error en rojo. Estos pueden indicar por qué la página está en blanco.</p>
+        <div class="error-example">
+          Uncaught TypeError: Cannot read properties of undefined (reading 'map')<br>
+          at Component (app.js:123)
+        </div>
+      </div>
+    </div>
+    
+    <div class="note">
+      <h3>Posibles Soluciones:</h3>
+      <ol>
+        <li>Si ves errores relacionados con módulos no encontrados, ejecuta <code>npm install</code> para instalar las dependencias faltantes.</li>
+        <li>Si ves errores de sintaxis, revisa los archivos mencionados en los mensajes de error.</li>
+        <li>Si ves errores de conexión al backend, asegúrate de que el backend esté funcionando o usa la versión local.</li>
+        <li>Intenta borrar la caché del navegador (Ctrl+F5 o Cmd+Shift+R).</li>
+        <li>Prueba con otro navegador para ver si el problema persiste.</li>
+      </ol>
+    </div>
+    
+    <script>
+      // Este script intentará detectar si hay problemas con JavaScript en el navegador
+      try {
+        console.log('JavaScript está funcionando correctamente en este navegador.');
+        
+        // Verificar si localStorage está disponible
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('test', 'test');
+          localStorage.removeItem('test');
+          console.log('localStorage está disponible y funcionando.');
+        } else {
+          console.error('localStorage no está disponible en este navegador.');
+        }
+        
+        // Verificar si fetch está disponible
+        if (typeof fetch !== 'undefined') {
+          console.log('fetch API está disponible.');
+        } else {
+          console.error('fetch API no está disponible en este navegador.');
+        }
+      } catch (error) {
+        console.error('Error al ejecutar JavaScript:', error);
+      }
+    </script>
+  </div>
+</body>
+</html>

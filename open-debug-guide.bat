@@ -1,0 +1,3 @@
+@echo off
+echo Opening debug guide in default browser...
+start debug.html

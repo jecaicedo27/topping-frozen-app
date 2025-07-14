@@ -1,0 +1,3 @@
+@echo off
+echo Opening console check guide in default browser...
+start check-console.html
