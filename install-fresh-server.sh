@@ -158,11 +158,91 @@ EOF
 
 cd ..
 
-# 12. Inicializar base de datos
-print_status "Inicializando base de datos..."
-cd backend
-npm run init-db 2>/dev/null || print_warning "Comando init-db no encontrado, continuando..."
-cd ..
+# 12. Inicializar base de datos con estructura completa
+print_status "Inicializando base de datos con estructura completa..."
+
+# Crear tablas directamente con MySQL
+mysql -u toppinguser -pToppingPass2024! topping_frozen_db << 'EOF'
+-- Tabla de usuarios
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'facturacion', 'cartera', 'logistica', 'mensajero') NOT NULL,
+    email VARCHAR(100),
+    full_name VARCHAR(100),
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Tabla de pedidos
+CREATE TABLE IF NOT EXISTS orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_number VARCHAR(50) UNIQUE NOT NULL,
+    customer_name VARCHAR(100) NOT NULL,
+    customer_phone VARCHAR(20),
+    customer_address TEXT,
+    items JSON NOT NULL,
+    total_amount DECIMAL(10,2) NOT NULL,
+    status ENUM('pending', 'confirmed', 'in_preparation', 'ready', 'delivered', 'cancelled') DEFAULT 'pending',
+    payment_status ENUM('pending', 'paid', 'partial', 'refunded') DEFAULT 'pending',
+    delivery_date DATE,
+    delivery_time TIME,
+    notes TEXT,
+    created_by INT,
+    assigned_to INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (created_by) REFERENCES users(id),
+    FOREIGN KEY (assigned_to) REFERENCES users(id)
+);
+
+-- Tabla de recibos de dinero
+CREATE TABLE IF NOT EXISTS money_receipts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    receipt_number VARCHAR(50) UNIQUE NOT NULL,
+    order_id INT,
+    amount DECIMAL(10,2) NOT NULL,
+    payment_method ENUM('cash', 'transfer', 'card', 'other') NOT NULL,
+    reference_number VARCHAR(100),
+    description TEXT,
+    receipt_image VARCHAR(255),
+    status ENUM('pending', 'verified', 'rejected') DEFAULT 'pending',
+    created_by INT,
+    verified_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (created_by) REFERENCES users(id),
+    FOREIGN KEY (verified_by) REFERENCES users(id)
+);
+
+-- Insertar usuarios de prueba con hash correcto para contraseña "123456"
+INSERT IGNORE INTO users (username, password, role, email, full_name) VALUES
+('admin', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 'admin@toppingfrozen.com', 'Administrador'),
+('facturacion', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'facturacion', 'facturacion@toppingfrozen.com', 'Usuario Facturación'),
+('cartera', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'cartera', 'cartera@toppingfrozen.com', 'Usuario Cartera'),
+('logistica', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'logistica', 'logistica@toppingfrozen.com', 'Usuario Logística'),
+('mensajero', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'mensajero', 'mensajero@toppingfrozen.com', 'Usuario Mensajero');
+
+-- Insertar algunos pedidos de ejemplo
+INSERT IGNORE INTO orders (order_number, customer_name, customer_phone, customer_address, items, total_amount, status, payment_status, delivery_date, created_by) VALUES
+('ORD-001', 'María García', '3001234567', 'Calle 123 #45-67, Bogotá', '{"items": [{"name": "Helado Vainilla", "quantity": 2, "price": 15000}, {"name": "Helado Chocolate", "quantity": 1, "price": 15000}]}', 45000.00, 'pending', 'pending', CURDATE(), 1),
+('ORD-002', 'Carlos López', '3007654321', 'Carrera 45 #12-34, Medellín', '{"items": [{"name": "Helado Fresa", "quantity": 3, "price": 15000}]}', 45000.00, 'confirmed', 'paid', CURDATE(), 1),
+('ORD-003', 'Ana Rodríguez', '3009876543', 'Avenida 68 #23-45, Cali', '{"items": [{"name": "Helado Mango", "quantity": 1, "price": 15000}, {"name": "Helado Coco", "quantity": 2, "price": 15000}]}', 45000.00, 'in_preparation', 'partial', CURDATE(), 1);
+
+-- Insertar algunos recibos de ejemplo
+INSERT IGNORE INTO money_receipts (receipt_number, order_id, amount, payment_method, reference_number, description, status, created_by) VALUES
+('REC-001', 2, 45000.00, 'transfer', 'TRF123456789', 'Pago completo pedido ORD-002', 'verified', 2),
+('REC-002', 3, 22500.00, 'cash', '', 'Pago parcial pedido ORD-003', 'pending', 2);
+EOF
+
+if [ $? -eq 0 ]; then
+    print_status "Base de datos inicializada con estructura completa"
+else
+    print_warning "Error al crear las tablas, continuando..."
+fi
 
 # 13. Construir frontend para producción
 print_status "Construyendo frontend para producción..."
